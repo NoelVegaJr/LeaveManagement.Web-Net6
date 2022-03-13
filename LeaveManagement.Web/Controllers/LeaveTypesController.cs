@@ -79,11 +79,12 @@ namespace LeaveManagement.Web.Controllers
                 return NotFound();
             }
 
-            var leaveType = await _context.LeaveTypes.FindAsync(id);
+            var leaveType = mapper.Map<LeaveTypeVM>( await _context.LeaveTypes.FindAsync(id));
             if (leaveType == null)
             {
                 return NotFound();
             }
+
             return View(leaveType);
         }
 
@@ -92,9 +93,10 @@ namespace LeaveManagement.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,DefaultDays,Id,DateCreated,DateModified")] LeaveType leaveTypeVM)
+        public async Task<IActionResult> Edit(int id, [Bind("Name,DefaultDays,Id,DateCreated,DateModified")] LeaveTypeVM leaveTypeVM)
         {
-            if (id != leaveTypeVM.Id)
+            var leaveType = mapper.Map<LeaveType>(leaveTypeVM);
+            if (id != leaveType.Id)
             {
                 return NotFound();
             }
@@ -103,12 +105,12 @@ namespace LeaveManagement.Web.Controllers
             {
                 try
                 {
-                    _context.Update(leaveTypeVM);
+                    _context.Update(leaveType);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!LeaveTypeExists(leaveTypeVM.Id))
+                    if (!LeaveTypeExists(leaveType.Id))
                     {
                         return NotFound();
                     }
